@@ -1,15 +1,51 @@
 #include <Arduino.h>
-#include "configuration.hpp"
+
+#include "camera.hpp"
+#include "esp32-hal-gpio.h"
+#include "esp_err.h"
+#include "server.hpp"
 #include "wifi.hpp"
 
+esp_err_t fb_status = ESP_OK;
+
 void setup() {
-  // load default configuration
+  Serial.begin(115200);
+  Serial.setDebugOutput(true);
   Configuration config = Configuration::load();
 
-  // init wifi AP
-  init_wifi(config);
+  pinMode(33, OUTPUT);
+
+  Serial.println("Initiating camera...");
+  esp_err_t err = init_camera();
+  if (err == ESP_FAIL) {
+    Serial.printf("Camera failed to init, error: 0x%x\n", err);
+  }
+
+  Serial.println("Initiating WiFi connection...");
+  err = init_wifi(config);
+  if (err == ESP_FAIL) {
+    Serial.printf("WiFi failed to init, error: 0x%x\n", err);
+  }
+
+  Serial.println("Initiating server...");
+  err = init_server();
+  if (err == ESP_FAIL) {
+    Serial.printf("Server failed to init, error: 0x%x\n", err);
+  }
 }
 
 void loop() {
-    delay(1000);
+  digitalWrite(33, HIGH);
+  check_connection();
+  ws_cleanup();
+
+  camera_fb_t* fb = esp_camera_fb_get();
+  if (!fb) {
+    fb_status = ESP_FAIL;
+  } else {
+    fb_status = ESP_OK;
+    ws_send_fb(fb);
+  }
+
+  esp_camera_fb_return(fb);
 }

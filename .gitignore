@@ -6,3 +6,4 @@
 .platformio
 
 src/configuration.hpp
+compile_commands.json

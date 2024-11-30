@@ -11,16 +11,9 @@
         f {
           pkgs = import nixpkgs {
             inherit system;
-            #   overlays = [self.overlays.default];
           };
         });
   in {
-    #    overlays.default = final: prev: {
-    #      platformio-core = prev.platformio-core.overridePythonAttrs (oldAttrs: {
-    #        version = "6.1.16";
-    #      });
-    #    };
-
     devShells = forEachSupportedSystem ({pkgs}: {
       default = pkgs.mkShell {
         packages = with pkgs;
@@ -36,11 +29,6 @@
             platformio
             vcpkg
             vcpkg-tool
-
-            # node
-            node2nix
-            nodejs
-            nodePackages.pnpm
           ]
           ++ pkgs.lib.optionals (system != "aarch64-darwin") [gdb];
 

@@ -2,10 +2,11 @@
 #define CONFIGURATION_H
 
 class Configuration {
-public:
+ public:
   struct WifiConfiguration {
-    char *ssid = "Green Robot";
-    char *password = "greenrobot";
+    char *ssid = "SSID";
+    char *password = "PASSWORD";
+    char *mdns = "MDNS";
   } wifi;
 
   static Configuration load();

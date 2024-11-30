@@ -1,9 +1,11 @@
 #ifndef WIFI_H
 #define WIFI_H
 
-#include "configuration.hpp"
 #include <WiFi.h>
 
-void init_wifi(Configuration config);
+#include "configuration.hpp"
+
+esp_err_t init_wifi(Configuration config);
+void check_connection();
 
 #endif

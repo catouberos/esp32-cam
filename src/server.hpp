@@ -2,8 +2,10 @@
 #define SERVER_H
 
 #include <ESPAsyncWebServer.h>
+#include <SPIFFS.h>
 
 #include "esp_camera.h"
+#include "esp_err.h"
 
 esp_err_t init_server();
 void ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client,

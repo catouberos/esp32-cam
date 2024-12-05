@@ -1,13 +1,18 @@
 #include "server.hpp"
 
-#include "esp_err.h"
-
 AsyncWebServer server(80);
 AsyncWebSocket ws("/websocket");
 
 esp_err_t init_server() {
   ws.onEvent(ws_event);
   server.addHandler(&ws);
+
+  // start SPIFFS
+  if (!SPIFFS.begin()) {
+    return ESP_FAIL;
+  }
+
+  server.serveStatic("/", SPIFFS, "/").setDefaultFile("index.html");
 
   server.begin();
 

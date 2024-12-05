@@ -9,17 +9,20 @@ unsigned long previous_time = 0;
 unsigned long reconnect_delay = 20000;
 
 esp_err_t init_wifi(Configuration config) {
-  WiFi.mode(WIFI_MODE_STA);
+  //  WiFi.mode(WIFI_MODE_STA);
+  //
+  //  IPAddress local_IP(config.wifi.ip);
+  //  IPAddress gateway(config.wifi.gateway);
+  //  IPAddress subnet(config.wifi.subnet);
+  //
+  //  if (!WiFi.config(local_IP, gateway, subnet)) {
+  //    return ESP_FAIL;
+  //  }
+  //
+  //  WiFi.begin(config.wifi.ssid, config.wifi.password);
 
-  IPAddress local_IP(config.wifi.ip);
-  IPAddress gateway(config.wifi.gateway);
-  IPAddress subnet(config.wifi.subnet);
-
-  if (!WiFi.config(local_IP, gateway, subnet)) {
-    return ESP_FAIL;
-  }
-
-  WiFi.begin(config.wifi.ssid, config.wifi.password);
+  WiFi.mode(WIFI_MODE_AP);
+  WiFi.softAP("Green Robot", "greenrobot");
 
   return ESP_OK;
 }

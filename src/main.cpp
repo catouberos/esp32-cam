@@ -10,7 +10,6 @@ esp_err_t fb_status = ESP_OK;
 
 void setup() {
   Serial.begin(115200);
-  Serial.setDebugOutput(true);
   Configuration config = Configuration::load();
 
   pinMode(33, OUTPUT);
@@ -36,7 +35,6 @@ void setup() {
 
 void loop() {
   digitalWrite(33, HIGH);
-  check_connection();
   ws_cleanup();
 
   camera_fb_t* fb = esp_camera_fb_get();

@@ -29,6 +29,11 @@
             platformio
             vcpkg
             vcpkg-tool
+
+            # node
+            node2nix
+            nodejs
+            nodePackages.pnpm
           ]
           ++ pkgs.lib.optionals (system != "aarch64-darwin") [gdb];
 

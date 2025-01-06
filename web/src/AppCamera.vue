@@ -1,20 +1,27 @@
 <script setup lang="ts">
 import { useWebSocket } from "@vueuse/core";
 import CameraScreen from "./components/CameraScreen.vue";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import StatusBadge from "./components/StatusBadge.vue";
+import FlashlightToggle from "./components/FlashlightToggle.vue";
 
 const url = ref(`ws://${window.location.hostname}/websocket`);
+const flash = defineModel("flash", { default: false });
 
-const { open, status, data } = useWebSocket<Blob>(url, {
+const { open, status, data, send } = useWebSocket<Blob>(url, {
   autoReconnect: true,
   autoClose: false,
+});
+
+watch([flash], () => {
+  send("f");
 });
 </script>
 
 <template>
-  <div class="relative">
+  <div class="relative sm:flex-1 grow shrink-0 basis-full">
     <StatusBadge :status class="absolute right-0 top-0 m-3" />
+    <FlashlightToggle v-model="flash" class="absolute left-0 bottom-0 m-3" />
     <CameraScreen
       v-if="status == 'OPEN' && data"
       class="w-full h-auto aspect-[4/3] rounded"

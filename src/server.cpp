@@ -34,6 +34,10 @@ void ws_event(AsyncWebSocket *server, AsyncWebSocketClient *client,
       if (info->final && info->index == 0 && info->len == len &&
           info->opcode == WS_TEXT) {
         data[len] = 0;
+
+        if (data[0] == 'f') {
+          digitalWrite(4, !digitalRead(4));
+        }
         // if data === toggle
         // if (strcmp((char *)data, "x") == 0) {
         //   ws.textAll(String(x));

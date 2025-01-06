@@ -12,6 +12,9 @@ void setup() {
   Serial.begin(115200);
   Configuration config = Configuration::load();
 
+  // flashlight
+  pinMode(4, OUTPUT);
+  // internal red LED
   pinMode(33, OUTPUT);
 
   Serial.println("Initiating camera...");

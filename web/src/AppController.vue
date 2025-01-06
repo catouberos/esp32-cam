@@ -3,13 +3,10 @@ import { useWebSocket } from "@vueuse/core";
 import StatusBadge from "./components/StatusBadge.vue";
 import { Joystick, JoystickComponent } from "vue-joystick-component";
 
-const { status, send } = useWebSocket(
-  `ws://${window.location.hostname}/websocket`,
-  {
-    autoReconnect: true,
-    autoClose: false,
-  },
-);
+const { status, send } = useWebSocket(`ws://192.168.4.250/websocket`, {
+  autoReconnect: true,
+  autoClose: false,
+});
 
 function reset() {
   send("0,0,REST");

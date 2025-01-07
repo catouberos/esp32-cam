@@ -1,6 +1,4 @@
 <script setup lang="tsx">
-import { defineModel } from "vue";
-
 const enabled = defineModel<boolean>({ required: true });
 </script>
 

@@ -46,7 +46,7 @@ watchDebounced(
       if (controller.value.dpad.down.pressed && rotateMultiplier.value[0] > 0) {
         rotateMultiplier.value[0] -= 10;
       }
-      if (controller.value.dpad.up.pressed && rotateMultiplier.value[0] < 100) {
+      if (controller.value.dpad.up.pressed && rotateMultiplier.value[0] < 200) {
         rotateMultiplier.value[0] += 10;
       }
 

@@ -5,6 +5,8 @@ import { SliderRange, SliderRoot, SliderThumb, SliderTrack } from "reka-ui";
 import DpadControl from "./components/DpadControl.vue";
 import ButtonControl from "./components/ButtonControl.vue";
 import { ref, watch } from "vue";
+import { PIDData } from "./type";
+import NumpadControl from "./components/NumpadControl.vue";
 
 const x = defineModel("x", { default: 0 });
 const y = defineModel("y", { default: 0 });
@@ -20,7 +22,22 @@ const _b = ref(false);
 const _left = ref(false);
 const _right = ref(false);
 
-const { send } = useWebSocket(`ws://192.168.4.250/websocket`, {
+const counter = ref(0);
+const motor = defineModel<{
+  topLeft: PIDData[];
+  topRight: PIDData[];
+  bottomLeft: PIDData[];
+  bottomRight: PIDData[];
+}>("motor", {
+  default: {
+    topLeft: [],
+    topRight: [],
+    bottomLeft: [],
+    bottomRight: [],
+  },
+});
+
+const { send, data } = useWebSocket<string>(`ws://192.168.4.250/websocket`, {
   autoReconnect: true,
   autoClose: false,
 });
@@ -43,11 +60,73 @@ function move(event: JoystickComponent.UpdateEvent) {
   y.value = event.y ?? 0;
 }
 
+function preset(i: number) {
+  const command = (i + 9).toString(36);
+  console.info("preset", command);
+  send(command);
+}
+
 watch([_x, _y, _a, _b, _left, _right], () => {
   x.value = (_b.value ? 1 : 0) - (_x.value ? 1 : 0);
   y.value = (_y.value ? 1 : 0) - (_a.value ? 1 : 0);
   omega.value = (_right.value ? 1 : 0) - (_left.value ? 1 : 0);
 });
+
+watchDebounced(
+  [data],
+  () => {
+    const values = data.value
+      ?.replace("\n", "")
+      .split(",")
+      .map((v) => parseInt(v));
+
+    if (values) {
+      motor.value.topLeft.push({
+        x: counter.value,
+        kp: values[0],
+        ki: values[1],
+        kd: values[2],
+      });
+      motor.value.topRight.push({
+        x: counter.value,
+        kp: values[3],
+        ki: values[4],
+        kd: values[5],
+      });
+      motor.value.bottomLeft.push({
+        x: counter.value,
+        kp: values[6],
+        ki: values[7],
+        kd: values[8],
+      });
+      motor.value.bottomRight.push({
+        x: counter.value,
+        kp: values[9],
+        ki: values[10],
+        kd: values[11],
+      });
+
+      if (motor.value.topLeft.length > 300) {
+        motor.value.topLeft.shift();
+      }
+
+      if (motor.value.topRight.length > 300) {
+        motor.value.topRight.shift();
+      }
+
+      if (motor.value.bottomLeft.length > 300) {
+        motor.value.bottomLeft.shift();
+      }
+
+      if (motor.value.bottomRight.length > 300) {
+        motor.value.bottomRight.shift();
+      }
+    }
+
+    counter.value++;
+  },
+  { debounce: 100, maxWait: 100 },
+);
 
 watchDebounced(
   [x, y, omega, moveMultiplier, rotateMultiplier],
@@ -100,7 +179,7 @@ watchDebounced(
   </div>
 
   <div
-    class="flex items-center justify-center flex-col gap-6 sm:order-last z-10 p-6 basis-[50%] sm:basis-auto"
+    class="flex items-center justify-center flex-col gap-6 sm:order-3 z-10 p-6 basis-[50%] sm:basis-auto"
   >
     <ButtonControl
       v-model:x="_x"
@@ -122,7 +201,7 @@ watchDebounced(
     <SliderRoot
       v-model="moveMultiplier"
       class="relative flex items-center select-none touch-none w-full h-5"
-      :max="100"
+      :max="250"
       :step="10"
     >
       <SliderTrack class="bg-neutral-500/30 relative grow rounded-full h-2">
@@ -133,5 +212,10 @@ watchDebounced(
         aria-label="Speed multiplier"
       />
     </SliderRoot>
+  </div>
+
+  <div class="order-last basis-full items-center text-center space-y-3">
+    <h4 class="font-bold text-lg">Presets</h4>
+    <NumpadControl @click="preset" />
   </div>
 </template>

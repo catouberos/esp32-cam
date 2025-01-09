@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "4.0.0-beta.8",
+    "@unovis/ts": "^1.5.0",
+    "@unovis/vue": "^1.5.0",
     "@vueuse/core": "^12.3.0",
     "reka-ui": "1.0.0-alpha.8",
     "tailwindcss": "4.0.0-beta.4",

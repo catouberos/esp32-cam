@@ -8,6 +8,9 @@ import {
   watchDebounced,
 } from "@vueuse/core";
 import GamepadBadge from "./components/GamepadBadge.vue";
+import AppChart from "./AppChart.vue";
+import { PIDData } from "./type";
+import { VisBulletLegend } from "@unovis/vue";
 
 const x = ref(0);
 const y = ref(0);
@@ -21,6 +24,18 @@ const gamepad = computed(() =>
   gamepads.value.find((g) => g.mapping === "standard"),
 );
 const controller = gamepad ? mapGamepadToXbox360Controller(gamepad) : undefined;
+
+const motor = ref<{
+  topLeft: PIDData[];
+  topRight: PIDData[];
+  bottomLeft: PIDData[];
+  bottomRight: PIDData[];
+}>({
+  topLeft: [],
+  topRight: [],
+  bottomLeft: [],
+  bottomRight: [],
+});
 
 watchDebounced(
   [controller],
@@ -79,11 +94,17 @@ watchDebounced(
   },
   { debounce: 50, maxWait: 50 },
 );
+
+const items = [
+  { name: "Input", color: "red" },
+  { name: "Output", color: "green" },
+  { name: "Reference", color: "blue" },
+];
 </script>
 
 <template>
-  <main class="mx-auto p-3">
-    <div class="flex flex-wrap justify-between">
+  <main class="mx-auto p-3 space-y-6">
+    <div class="flex flex-wrap justify-between min-h-screen items-center">
       <AppCamera v-model:flash="flash" />
       <AppController
         v-model:x="x"
@@ -91,11 +112,34 @@ watchDebounced(
         v-model:omega="omega"
         v-model:move-multiplier="moveMultiplier"
         v-model:rotate-multiplier="rotateMultiplier"
+        v-model:motor="motor"
+      />
+
+      <GamepadBadge
+        v-if="isSupported"
+        :enabled="isActive"
+        class="fixed z-10 bottom-6 right-6"
       />
     </div>
 
-    <div class="flex items-center justify-center mt-6">
-      <GamepadBadge v-if="isSupported" :enabled="isActive" class="mx-auto" />
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 p-6">
+      <div class="space-y-3">
+        <h4 class="text-center">Top Left Motor</h4>
+        <AppChart :data="motor.topLeft" />
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-center">Top Right Motor</h4>
+        <AppChart :data="motor.topRight" />
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-center">Bottom Left Motor</h4>
+        <AppChart :data="motor.bottomLeft" />
+      </div>
+      <div class="space-y-3">
+        <h4 class="text-center">Bottom Right Motor</h4>
+        <AppChart :data="motor.bottomRight" />
+      </div>
+      <VisBulletLegend :items />
     </div>
   </main>
 </template>
